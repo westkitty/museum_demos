@@ -16,8 +16,6 @@
       "industrial",
       "Drakken"
     ],
-    "compilation": "{\"root\":\"/mnt/data/audition-expansion/workspace/worlds/machine-worlds\",\"transformed\":9,\"extraCss\":[\"src/style.css\"]}",
-    "compile_errors": "",
     "technical_state": "converted-source",
     "opportunities": [
       {
@@ -69,8 +67,6 @@
       "puzzle",
       "Dex systems"
     ],
-    "compilation": "{\"root\":\"/mnt/data/audition-expansion/workspace/worlds/dollhouse\",\"transformed\":2,\"extraCss\":[\"src/style.css\"]}",
-    "compile_errors": "",
     "technical_state": "converted-source",
     "opportunities": [
       {
@@ -122,8 +118,6 @@
       "puzzle",
       "authority"
     ],
-    "compilation": "{\"root\":\"/mnt/data/audition-expansion/workspace/worlds/portal\",\"transformed\":8,\"extraCss\":[]}",
-    "compile_errors": "",
     "technical_state": "converted-source",
     "opportunities": [
       {
@@ -226,8 +220,6 @@
       "traversal",
       "tilt"
     ],
-    "compilation": "{\"root\":\"/mnt/data/audition-expansion/workspace/worlds/tilt-city\",\"transformed\":8,\"extraCss\":[\"src/style.css\"]}",
-    "compile_errors": "",
     "technical_state": "converted-source",
     "opportunities": [
       {
@@ -279,8 +271,6 @@
       "ritual",
       "Parable"
     ],
-    "compilation": "{\"root\":\"/mnt/data/audition-expansion/workspace/worlds/small-god\",\"transformed\":8,\"extraCss\":[\"src/style.css\"]}",
-    "compile_errors": "",
     "technical_state": "converted-source",
     "opportunities": [
       {
@@ -435,8 +425,6 @@
       "traversal",
       "garden"
     ],
-    "compilation": "{\"root\":\"/mnt/data/audition-expansion/workspace/worlds/overwatered\",\"transformed\":7,\"extraCss\":[\"src/style.css\"]}",
-    "compile_errors": "",
     "technical_state": "converted-source",
     "opportunities": [
       {
@@ -488,8 +476,6 @@
       "traversal",
       "toy"
     ],
-    "compilation": "{\"root\":\"/mnt/data/audition-expansion/workspace/worlds/full-weasel\",\"transformed\":7,\"extraCss\":[\"src/style.css\"]}",
-    "compile_errors": "",
     "technical_state": "converted-source",
     "opportunities": [
       {
@@ -592,8 +578,6 @@
       "traversal",
       "space"
     ],
-    "compilation": "{\"root\":\"/mnt/data/audition-expansion/workspace/worlds/fleetgrave\",\"transformed\":5,\"extraCss\":[\"src/style.css\"]}",
-    "compile_errors": "",
     "technical_state": "converted-source",
     "opportunities": [
       {
@@ -645,8 +629,6 @@
       "traversal",
       "WestCat"
     ],
-    "compilation": "{\"root\":\"/mnt/data/audition-expansion/workspace/worlds/westcat-speed\",\"transformed\":4,\"extraCss\":[\"src/style.css\"]}",
-    "compile_errors": "",
     "technical_state": "converted-source",
     "opportunities": [
       {
@@ -749,8 +731,6 @@
       "exploration",
       "cosmic"
     ],
-    "compilation": "{\"root\":\"/mnt/data/audition-expansion/workspace/worlds/infinitum\",\"transformed\":33,\"extraCss\":[\"src/style.css\"]}",
-    "compile_errors": "",
     "technical_state": "addon-dependency-unresolved",
     "opportunities": [
       {
@@ -998,3 +978,23 @@
     "family": "exploration",
     "controls": "Swim WASD, Space/E ascend, C/Q descend, Shift boost; F sonar, J drone jet, X cutaway, P photo.",
     "caption": "An underwater observatory waits to be understood and restored.",
+    "file": "Pelagia_LATEST_verified_project.zip",
+    "prefix": "dist/",
+    "mode": "prebuilt",
+    "accent": "#7fe4e5",
+    "tags": [
+      "underwater",
+      "exploration"
+    ],
+    "technical_state": "prebuilt",
+    "opportunities": [
+      {
+        "title": "Sonar as spatial wayfinding",
+        "reason": "Offer readable range/bearing feedback without relying only on audio or glow.",
+        "state": "PROPOSED"
+      },
+      {
+        "title": "Restoration ecosystem causality",
+        "reason": "Show floodgate, turbine, coral and astral-conjunction relationships clearly.",
+        "state": "PROPOSED"
+      },

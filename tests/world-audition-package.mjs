@@ -13,6 +13,10 @@ assert.equal(catalog.flatMap(x=>x.opportunities).length,105);
 assert.equal(catalog.filter(x=>x.playable_candidate).length,20);
 assert(!fs.existsSync(path.join(root,'archives')),'private source archives must not be public');
 assert(!fs.existsSync(path.join(root,'worlds')),'no raw build/source tree may be public');
+for(const file of ['index.html','assets/worlds.json']){
+ const text=fs.readFileSync(path.join(root,file),'utf8');
+ assert(!/(?:\/mnt\/data|\/Users\/|\/home\/oai|(?:C:|D:)\\\\Users\\\\)/.test(text),`${file} contains internal build-machine paths`);
+}
 for(const rel of ['sw.js','assets/lab.js','assets/lab.css','assets/public-boot.js','vendor/three.module.min.js','vendor/three.core.min.js','vendor/THREE_LICENSE.txt'])assert(fs.existsSync(path.join(root,rel)),rel);
 const payloads=JSON.parse(fs.readFileSync(path.join(root,'docs/PUBLIC_PAYLOADS.json'),'utf8'));
 assert.equal(payloads.length,20);

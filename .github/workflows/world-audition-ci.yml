@@ -27,3 +27,12 @@ jobs:
         run: |
           python3 -m http.server 8765 --bind 127.0.0.1 --directory public > /tmp/world-audition-http.log 2>&1 &
           node tests/world-audition-browser.mjs
+      - name: Prove Pages build can host the Lab at the demo repository base
+        env:
+          VITE_PUBLIC_BASE: /museum_demos/
+          MUSEUM_BUILD_SHA: ${{ github.sha }}
+          MUSEUM_BUILD_REF: ${{ github.ref_name }}
+        run: |
+          npm run build:pages
+          npm run verify:pages-dist
+          node tests/world-audition-pages.mjs

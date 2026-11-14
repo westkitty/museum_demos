@@ -14,7 +14,7 @@ function git(args) {
 
 const sha = process.env.MUSEUM_BUILD_SHA || git(['rev-parse', 'HEAD']);
 const ref = process.env.MUSEUM_BUILD_REF || git(['branch', '--show-current']) || 'detached';
-const base = process.env.VITE_PUBLIC_BASE || '/museum-of-me-vnext/';
+const base = process.env.VITE_PUBLIC_BASE || '/museum_demos/';
 
 writeFileSync(`${root}/.nojekyll`, '');
 copyFileSync(`${root}/index.html`, `${root}/404.html`);

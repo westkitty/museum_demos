@@ -3,7 +3,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 const root = 'dist';
-const expectedBase = process.env.VITE_PUBLIC_BASE || '/museum-of-me-vnext/';
+const expectedBase = process.env.VITE_PUBLIC_BASE || '/museum_demos/';
 const expectedSha = process.env.MUSEUM_BUILD_SHA || '';
 const errors = [];
 const checks = [];

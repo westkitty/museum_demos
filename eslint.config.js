@@ -10,6 +10,8 @@ export default tseslint.config(
       // E27's pinned first-party production build is runtime data, not Museum
       // source. Its provenance and byte integrity are checked separately.
       'public/embedded/**',
+      // Independent audition previews are packaged browser output with their own source and runtime gates.
+      'public/world-audition/**',
       'node_modules/**',
       'playwright-report/**',
       'test-results/**',

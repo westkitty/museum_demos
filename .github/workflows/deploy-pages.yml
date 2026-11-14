@@ -39,15 +39,17 @@ jobs:
         run: npm run test:e2e
       - name: build GitHub Pages artifact
         env:
-          VITE_PUBLIC_BASE: /museum-of-me-vnext/
+          VITE_PUBLIC_BASE: /museum_demos/
           MUSEUM_BUILD_SHA: ${{ github.sha }}
           MUSEUM_BUILD_REF: ${{ github.ref_name }}
         run: npm run build:pages
       - name: verify GitHub Pages artifact shape
         env:
-          VITE_PUBLIC_BASE: /museum-of-me-vnext/
+          VITE_PUBLIC_BASE: /museum_demos/
           MUSEUM_BUILD_SHA: ${{ github.sha }}
         run: npm run verify:pages-dist
+      - name: verify World Audition Lab public Pages shape and privacy
+        run: node tests/world-audition-pages.mjs
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
@@ -70,3 +72,5 @@ jobs:
           node-version: 22
       - name: verify exact deployed Pages revision
         run: node scripts/verify-pages-hosted.mjs "${{ steps.deployment.outputs.page_url }}" "${{ github.sha }}"
+      - name: verify hosted World Audition Lab at exact SHA
+        run: node tests/world-audition-hosted.mjs "${{ steps.deployment.outputs.page_url }}" "${{ github.sha }}"

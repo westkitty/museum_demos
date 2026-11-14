@@ -20,12 +20,26 @@ async function load(slug){if(running.has(slug))return running.get(slug);const re
  const buffer=await r.arrayBuffer();return{buffer,entries:zipEntries(buffer)};
 })();running.set(slug,req);if(running.size>2)running.delete(running.keys().next().value);
  return req.catch(e=>{running.delete(slug);throw e;});}
+// Gardens' optional standalone offline worker cannot be installed via the
+// Lab's virtual ZIP transport: Chromium fetches SW installation scripts
+// directly from the physical host. Preserve the original ZIP, and suppress
+// only this known optional registration in the served module.
+function adaptGardensModule(slug,key,bytes){
+ if(slug!=='gardens'||key!=='worlds/gardens/src/main.js')return bytes;
+ const source=new TextDecoder().decode(bytes);
+ const marker="navigator.serviceWorker.register('./sw.js').catch(() => { });";
+ // Fail open to untouched gameplay if the archived source ever drifts.
+ if(source.split(marker).length!==2)return bytes;
+ return new TextEncoder().encode(source.replace(marker,
+   'void 0; /* Lab outer service worker owns this offline preview. */'));
+}
 async function serve(url){const suffix=url.pathname.slice(scope.pathname.length);const parts=suffix.split('/');
  if(parts[0]!=='worlds'||parts.length<3)return fetch(url.toString());
  const slug=parts[1];if(!/^[a-z0-9-]+$/.test(slug))return new Response('Invalid world',{status:400});
  try{const {buffer,entries}=await load(slug),key=parts.join('/'),entry=entries.get(key);
   if(!entry)return new Response('Missing preview resource',{status:404});
-  const bytes=new Uint8Array(buffer,entry.offset,entry.length),ext=key.split('.').pop().toLowerCase();
+  const raw=new Uint8Array(buffer,entry.offset,entry.length),ext=key.split('.').pop().toLowerCase();
+  const bytes=adaptGardensModule(slug,key,raw);
   return new Response(bytes,{status:200,headers:{'Content-Type':types[ext]||'application/octet-stream','X-Content-Type-Options':'nosniff','Cache-Control':'public, max-age=86400'}});
  }catch(e){return new Response('Preview could not load',{status:503});}}
 self.addEventListener('fetch',event=>{const url=new URL(event.request.url);if(url.origin!==scope.origin||!url.pathname.startsWith(scope.pathname+'worlds/'))return;

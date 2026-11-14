@@ -12,6 +12,7 @@ const outfile=path.resolve('test-results/world-audition-gardens-forensics.json')
 const archivePath=path.join(root,'world-audition/payload/gardens.zip');
 const hash=()=>createHash('sha256').update(fs.readFileSync(archivePath)).digest('hex');
 const initialHash=hash();
+const expectAdapter=process.env.GARDENS_EXPECT_ADAPTER==='1';
 const hits=[];
 let phase='setup';
 const types={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.zip':'application/zip','.json':'application/json; charset=utf-8','.woff':'font/woff','.svg':'image/svg+xml','.png':'image/png'};
@@ -72,11 +73,12 @@ try{
       const frame=page.frameLocator('#player iframe');
       await frame.locator('#world').waitFor({state:'attached',timeout:30000});
       result.webgl2=await frame.locator('#world').evaluate(c=>!!c.getContext('webgl2'));
-      await page.waitForFunction(()=>{
-        const f=document.querySelector('#player iframe');
-        return !!f?.contentWindow?.__gardensRegistrationAudit?.attempts?.length;
-      },undefined,{timeout:15000});
-      await page.waitForTimeout(750);
+      // The fixed adapter suppresses the call. Wait for the actual frame's
+      // authored load event instead of waiting for registration to happen.
+      const active=page.frames().find(f=>f.url().includes('/worlds/gardens/index.html'));
+      if(!active)throw Error('Gardens iframe unexpectedly missing');
+      await active.waitForLoadState('load',{timeout:15000});
+      await page.waitForTimeout(900);
       const info=await frame.locator('body').evaluate(()=>window.__gardensRegistrationAudit);
       result.attempts=info.attempts;result.suppressions=info.suppressed;
       await page.locator('#play-close').evaluate(b=>b.click());
@@ -94,11 +96,22 @@ try{
   const [baseline,control]=report.cases;
   const expectedRegistered=x=>x.attempts.some(url=>url.endsWith(failed));
   if(!baseline.webgl2||!control.webgl2||!baseline.iframeRemoved||!control.iframeRemoved)throw Error('Startup or teardown was not preserved');
-  if(!expectedRegistered(baseline)||!expectedRegistered(control)||control.suppressions!==1)throw Error('Nested registration control did not execute as specified');
-  if(!report.baseline404s.some(r=>r.url===failed))throw Error('Exact nested SW script 404 was not reproduced');
-  if(report.control404s.some(r=>r.url===failed))throw Error('Nested SW script 404 persisted under the control');
   if(report.payloadSha256After!==initialHash)throw Error('Preview payload bytes unexpectedly changed');
-  report.verdict='CAUSAL_REPRODUCTION_PASS';
+  if(expectAdapter){
+    if(baseline.attempts.length||control.attempts.length||baseline.suppressions||control.suppressions)
+      throw Error('Nested registration still called under Lab adapter');
+    if(report.baseline404s.some(r=>r.url===failed)||report.control404s.some(r=>r.url===failed))
+      throw Error('Nested worker 404 persists under Lab adapter');
+    if(baseline.consoleErrors.length||control.consoleErrors.length||baseline.pageErrors.length||control.pageErrors.length)
+      throw Error('Console/page errors persisted after Lab adapter');
+    report.verdict='GARDENS_ADAPTER_REGRESSION_PASS';
+  }else{
+    if(!expectedRegistered(baseline)||!expectedRegistered(control)||control.suppressions!==1)
+      throw Error('Nested registration control did not execute');
+    if(!report.baseline404s.some(r=>r.url===failed))throw Error('Nested SW script 404 was not reproduced');
+    if(report.control404s.some(r=>r.url===failed))throw Error('Nested SW 404 persists after suppression');
+    report.verdict='CAUSAL_REPRODUCTION_PASS';
+  }
 }catch(error){report.verdict='UNVERIFIED';report.failure=String(error?.stack||error).slice(0,1200);process.exitCode=1;}
 finally{
   if(browser)await browser.close();

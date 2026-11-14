@@ -37,6 +37,10 @@ try {
   });
   const errors = [];
   page.on('pageerror', e => errors.push({kind:'pageerror', message:String(e.message).slice(0,500)}));
+  page.on('response', response => {
+    if (response.status() >= 400) errors.push({kind:'http-error',status:response.status(),url:response.url().slice(0,500)});
+  });
+  page.on('requestfailed', request => errors.push({kind:'request-failed',url:request.url().slice(0,500),failure:request.failure()?.errorText?.slice(0,200)}));
   page.on('console', m => {if(m.type()==='error')errors.push({kind:'console-error',message:m.text().slice(0,500)});});
   const r = await page.goto(base,{waitUntil:'domcontentloaded',timeout:30000});
   if (!r?.ok()) throw new Error('Lab host HTTP document unavailable');
@@ -46,7 +50,7 @@ try {
   for (const [i,world] of candidates.entries()) {
     if (!/^[a-z0-9-]+$/.test(world.id)) throw new Error('Unsafe world ID in catalog');
     const start = Date.now(), errorOffset = errors.length;
-    const item = {id:world.id,name:world.name,exhibit:world.exhibit,documentLoaded:false,webglContexts:0,webgl2Contexts:0,canvasCount:0,teardownRemoved:false,observedErrors:[],startupMs:null,proofState:'NOT_STARTED'};
+    const item = {id:world.id,name:world.name,exhibit:world.exhibit,documentLoaded:false,webglContexts:0,webgl2Contexts:0,canvasCount:0,teardownRemoved:false,authoredEntryActivated:false,observedErrors:[],startupMs:null,proofState:'NOT_STARTED'};
     try {
       await page.locator(`[data-open="${world.id}"]`).first().click({timeout:15000});
       await page.locator('#detail-launch').click({timeout:15000});
@@ -55,6 +59,16 @@ try {
         return !!f?.contentDocument && f.contentDocument.readyState === 'complete' && f.contentDocument.URL.includes('/worlds/'+id+'/index.html');
       },world.id,{timeout:45000});
       item.documentLoaded = true;
+      if (world.id === 'museum-e09') {
+        // Its authored intro deliberately delays WebGL initialization until ENTER E09.
+        const introFrame = page.frames().find(f=>f.url().includes('/worlds/museum-e09/index.html'));
+        if (!introFrame) throw new Error('E09 iframe unavailable after document load');
+        const enter = introFrame.locator('#enter-e09');
+        await enter.waitFor({state:'visible',timeout:5000});
+        await enter.click({timeout:10000});
+        item.authoredEntryActivated = true;
+        await introFrame.locator('canvas').first().waitFor({state:'attached',timeout:20000});
+      }
       await page.waitForTimeout(waitAfterLoadMs);
       const frame = page.frames().find(f=>f.url().includes('/worlds/'+world.id+'/index.html'));
       if (frame) {
@@ -92,6 +106,8 @@ try {
     webglObserved:report.worlds.filter(w=>w.webglContexts>0||w.webgl2Contexts>0).length,
     iframeTeardownPasses:report.worlds.filter(w=>w.teardownRemoved).length,
     worldsWithConsoleOrPageErrors:report.worlds.filter(w=>w.observedErrors.length>0).map(w=>w.id),
+    worldsWithHttpErrors:report.worlds.filter(w=>w.observedErrors.some(e=>e.kind==='http-error')).map(w=>w.id),
+    authoredEntryActivations:report.worlds.filter(w=>w.authoredEntryActivated).map(w=>w.id),
     worldsWithStartupFailures:report.worlds.filter(w=>!w.documentLoaded).map(w=>w.id),
     scope:'initialization observations only; manual full game playthroughs still required'
   };

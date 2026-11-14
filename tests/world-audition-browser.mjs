@@ -1,0 +1,21 @@
+import {chromium} from '@playwright/test';
+const url=process.env.WORLD_AUDITION_URL||'http://127.0.0.1:8765/world-audition/';
+const browser=await chromium.launch({headless:true,args:['--enable-unsafe-swiftshader','--use-gl=angle','--use-angle=swiftshader','--no-sandbox']});
+let errors=[];
+try{
+ const page=await browser.newPage({viewport:{width:1280,height:800},reducedMotion:'reduce'});
+ page.on('pageerror',e=>errors.push(e.message));
+ const response=await page.goto(url,{waitUntil:'domcontentloaded',timeout:30000});
+ if(!response||!response.ok())throw Error('Lab shell did not serve');
+ await page.locator('[data-open="dollhouse"]').first().click();
+ await page.locator('#detail-launch').click();
+ await page.locator('#player iframe').waitFor({state:'attached',timeout:25000});
+ const frame=page.frameLocator('#player iframe');
+ await frame.locator('canvas').first().waitFor({state:'attached',timeout:30000});
+ const webgl=await frame.locator('canvas').first().evaluate(c=>!!(c.getContext('webgl2')||c.getContext('webgl')));
+ if(!webgl)throw Error('No browser WebGL context in dollhouse candidate');
+ await page.locator('#play-close').click();
+ if(await page.locator('#player iframe').count())throw Error('Iframe persisted after close');
+ if(errors.length)throw Error('Browser page errors: '+errors.join(' | '));
+ console.log('PASS public preview smoke: service worker, dollhouse canvas/WebGL, iframe teardown, 0 page errors');
+}finally{await browser.close();}

@@ -1,0 +1,29 @@
+name: world audition preview validation
+on:
+  pull_request:
+    paths:
+      - 'public/world-audition/**'
+      - 'tests/world-audition-*.mjs'
+      - '.github/workflows/world-audition-ci.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Validate stored payloads and publication boundary
+        run: node tests/world-audition-package.mjs
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Smoke-test served preview through real Chromium WebGL
+        run: |
+          python3 -m http.server 8765 --bind 127.0.0.1 --directory public > /tmp/world-audition-http.log 2>&1 &
+          node tests/world-audition-browser.mjs

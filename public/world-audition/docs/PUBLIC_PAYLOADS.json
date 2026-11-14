@@ -1,0 +1,122 @@
+[
+  {
+    "slug": "machine-worlds",
+    "entries": 17,
+    "bytes": 156391,
+    "sha256": "1b2541880aa9fe3522a8c1e0826a5acc4c0681b65935c33ab6da764390c5170d"
+  },
+  {
+    "slug": "dollhouse",
+    "entries": 5,
+    "bytes": 23732,
+    "sha256": "0bca14b295f58ba1473e097a7892f6b1a7612b17a51e6d83f4da55b3792a9b1b"
+  },
+  {
+    "slug": "portal",
+    "entries": 11,
+    "bytes": 129892,
+    "sha256": "d6886f3e67c46603797672a871e2a21aae83f5833cce2cba1bf0fce9a2f893cc"
+  },
+  {
+    "slug": "museum-e09",
+    "entries": 12,
+    "bytes": 145323,
+    "sha256": "f3164c2b00ee9d50a51623ffa0242534ece8f89a1cf389bd4d73e5c7015b34de"
+  },
+  {
+    "slug": "tilt-city",
+    "entries": 20,
+    "bytes": 151159,
+    "sha256": "9495d6579e2a7e80a87cde8d808c4253d65b72c777e4be1031a58b1971628c62"
+  },
+  {
+    "slug": "small-god",
+    "entries": 10,
+    "bytes": 155693,
+    "sha256": "4813f4e3c32c3303be240081662288745acf35f7c4c7e0821fe382d05e2e3a70"
+  },
+  {
+    "slug": "super-prompt",
+    "entries": 9,
+    "bytes": 2219481,
+    "sha256": "85ab880eda1e2d85960d18932c540612fdc4a0f4605b66a787213e0acf7ae6b1"
+  },
+  {
+    "slug": "gardens",
+    "entries": 9,
+    "bytes": 888479,
+    "sha256": "99a27a3f26e62c6efaf77effc167e6e2850b91ec2ea8972a1250021d19376db6"
+  },
+  {
+    "slug": "overwatered",
+    "entries": 15,
+    "bytes": 152293,
+    "sha256": "dce2de3613d6d7fb405d339b0ae4b4efeaec0f05d8d18750793fb504a38e77c8"
+  },
+  {
+    "slug": "full-weasel",
+    "entries": 14,
+    "bytes": 163964,
+    "sha256": "221f2e24240552a796c48ffd35a9d0112e98748f8758b1d0daed099746ebdba0"
+  },
+  {
+    "slug": "westcat-coast",
+    "entries": 25,
+    "bytes": 1272113,
+    "sha256": "a68c4b5226ce8efb0d35db848ff1734d40a3a5f56747e12f571f9ca28d2b1ba3"
+  },
+  {
+    "slug": "fleetgrave",
+    "entries": 7,
+    "bytes": 144540,
+    "sha256": "a973991b002db8cbbb8a61e942310de934cb047c1f38f7dcf4fd7436bf625956"
+  },
+  {
+    "slug": "westcat-speed",
+    "entries": 11,
+    "bytes": 88641,
+    "sha256": "12f21d9462032f5dbc4a4085a5aab939f2074719b3dc8472bb8fd7aac92ad9f4"
+  },
+  {
+    "slug": "aetherfall",
+    "entries": 3,
+    "bytes": 581371,
+    "sha256": "a62457c5de75018be5348fd489c7680eee890a5466e3d5f5240949f805fe93ba"
+  },
+  {
+    "slug": "theater",
+    "entries": 3,
+    "bytes": 796495,
+    "sha256": "a72112ca82c3681dc263012193c4b4e8973d2de397e9f73f5ea9f60b1233f4fa"
+  },
+  {
+    "slug": "die-battlefield",
+    "entries": 2,
+    "bytes": 644777,
+    "sha256": "b40ee3e644b7bf380e2cf25bab9849de776679e02242c9eed34db8d2ad10c6cf"
+  },
+  {
+    "slug": "vesperglass",
+    "entries": 3,
+    "bytes": 865568,
+    "sha256": "72a42b6f32ccadf15d789df93494cb0dd3dc8994554924405ac313c2ee3bbb2e"
+  },
+  {
+    "slug": "aethervfx",
+    "entries": 3,
+    "bytes": 592344,
+    "sha256": "47f6b83fe02e35ce67afdce86f68b8d7f19609b80d43e1a5258a0f35f3c64ab3"
+  },
+  {
+    "slug": "pelagia",
+    "entries": 5,
+    "bytes": 849553,
+    "sha256": "a26cc8307310a3fd73f047b612e5d51f8c8e99ed197f7cfe70868851868da934"
+  },
+  {
+    "slug": "e33",
+    "entries": 2,
+    "bytes": 682151,
+    "sha256": "46cae44246b0da66881d77eeb7d484a4e085468a7b629efe6cc3ab26e41ce739"
+  }
+]

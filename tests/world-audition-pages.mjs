@@ -2,7 +2,7 @@
 // Independent public Pages contract. Does not touch the production museum registry.
 import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
-import {existsSync,readFileSync,statSync} from 'node:fs';
+import {existsSync,readFileSync} from 'node:fs';
 import path from 'node:path';
 const root=path.resolve('dist');
 const app=path.join(root,'world-audition');

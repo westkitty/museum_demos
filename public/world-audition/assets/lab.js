@@ -26,7 +26,7 @@
     document.body.classList.toggle('reduce-motion',prefs.motion);byId('motion-pref').checked=prefs.motion;
   }
   function persist(){try{localStorage.setItem(STORAGE,JSON.stringify({...record,prefs}));}catch(_){status('Local storage unavailable: your review is kept until you leave this page.');}}
-  function modeLabel(w){return ({'prebuilt':'SOURCE-PROVIDED BUILD','native-js':'OFFLINE JS ORIGINAL','converted-source':'OFFLINE-CONVERTED SOURCE','addon-dependency-unresolved':'SOURCE ONLY — NEEDS BUILD'})[w.technical_state]||'NOT VERIFIED';}
+  function modeLabel(w){return ({'prebuilt':'SOURCE-PROVIDED BUILD','native-js':'OFFLINE JS ORIGINAL','converted-source':'OFFLINE-CONVERTED SOURCE','addon-dependency-unresolved':'SOURCE ONLY — NEEDS BUILD','source-packaged-r187':'OFFLINE ORIGINAL — THREE.JS r187'})[w.technical_state]||'NOT VERIFIED';}
   function apparent(w){return !!w.playable_candidate;}
   function filtered(){return WORLD_LIST.filter(w => {
     if(filter==='try' && !apparent(w))return false;
@@ -73,6 +73,8 @@
     byId('detail-provenance').textContent=`${w.file} · ${w.archive_size.toLocaleString()} bytes · SHA-256 ${w.archive_sha256}`;
     byId('detail-status').textContent=w.technical_state==='addon-dependency-unresolved'
       ?'Blocked: Three.js 0.187.0 and its official OrbitControls addon must be built and tested before launch.'
+      :w.technical_state==='source-packaged-r187'
+      ?'Source-packaged with original Three.js r187 and OrbitControls. Browser startup is checked separately from full gameplay and device performance.'
       :w.technical_state==='converted-source'
       ?'Offline TypeScript-to-ESM conversion with local Three.js; syntactic checks are not proof of a browser playthrough.'
       :w.technical_state==='prebuilt'

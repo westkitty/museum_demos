@@ -118,5 +118,11 @@
     "entries": 2,
     "bytes": 682151,
     "sha256": "46cae44246b0da66881d77eeb7d484a4e085468a7b629efe6cc3ab26e41ce739"
+  },
+  {
+    "slug": "infinitum",
+    "entries": 50,
+    "bytes": 949945,
+    "sha256": "e1da7f3c7510e56ac613a17c0ec9365bb23d641208f4df71d8d6b535e9ef5e94"
   }
 ]

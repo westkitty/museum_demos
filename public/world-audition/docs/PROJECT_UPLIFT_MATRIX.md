@@ -320,3 +320,11 @@ The source archives are preserved unchanged in `../archives/`. The host interfac
 | 3 | Deterministic save audit | Check campaign serialization, reload and reset for source-consistent outcomes. | PROPOSED |
 | 4 | Keyboard and screen-reader map | Supply nonpointer access to star-system and doctrine controls. | PROPOSED |
 | 5 | Late-game density performance | Measure draw and layout costs after expansion rather than only at first turn. | PROPOSED |
+
+
+## 2026-11-14 — INFINITUM runtime dependency resolution (additive)
+
+- Project: INFINITUM v0.8.0, original source files and material textures preserved; original archive unchanged.
+- **SOURCE IMPLEMENTED:** exact official Three.js r187 WebGL module, core, OrbitControls and LICENSE vendored from mrdoob/three.js tag r187; local ZIP_STORED runtime candidate built from 50 original compiled JS/CSS/assets entries, plus an updated import map.
+- **PROOF PENDING:** live world startup, all three spatial worlds and two crossings, mobile touch, reduced motion, save/reload and sustained GPU performance. Existing historical proposals remain individually PROPOSED unless proven.
+- **NO RELEASE CLAIM:** new preview is review-only until matching CI, and no live Museum of Me vNext or Palimpsest code was changed.

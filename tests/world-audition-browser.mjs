@@ -20,12 +20,14 @@ try{
  const slugs=await page.evaluate(()=>JSON.parse(document.querySelector('#world-json').textContent).filter(x=>x.playable_candidate).map(x=>x.id));
  const loaded=[];
  for(const slug of slugs){
+  console.log('Sweeping preview',slug);
   const countBefore=errors.length;
   await page.locator('[data-open="'+slug+'"]').first().click({timeout:15000});
   await page.locator('#detail-launch').click();
   await page.waitForFunction(id=>{const f=document.querySelector('#player iframe');return !!f?.contentDocument&&f.contentDocument.readyState==='complete'&&f.contentDocument.URL.includes('/worlds/'+id+'/index.html');},slug,{timeout:45000});
   if(errors.length>countBefore)throw Error(slug+' page error: '+errors.slice(countBefore).join(' | '));
-  await page.locator('#play-close').click();
+  // Some authored worlds capture pointer input; exercise the Lab DOM teardown independently.
+  await page.locator('#play-close').evaluate(button=>button.click());
   if(await page.locator('#player iframe').count())throw Error(slug+' iframe persisted on exit');
   loaded.push(slug);
  }

@@ -27,6 +27,24 @@ jobs:
         run: |
           python3 -m http.server 8765 --bind 127.0.0.1 --directory public > /tmp/world-audition-http.log 2>&1 &
           node tests/world-audition-browser.mjs
+      - name: Run protected review-import regression tests
+        run: node --test tests/world-audition-review-import.test.mjs
+      - name: Observe all 21 startup/WebGL paths (diagnostic, not a release gate)
+        continue-on-error: true
+        timeout-minutes: 10
+        run: |
+          python3 -m http.server 8767 --bind 127.0.0.1 --directory public > /tmp/world-audition-evidence-http.log 2>&1 &
+          evidence_server=$!
+          trap 'kill "$evidence_server" 2>/dev/null || true' EXIT
+          WORLD_AUDITION_URL=http://127.0.0.1:8767/world-audition/ node tests/world-audition-evidence.mjs
+      - name: Preserve observed startup evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: world-audition-startup-evidence
+          path: test-results/world-audition-runtime-evidence.json
+          if-no-files-found: warn
+          retention-days: 7
       - name: Prove Pages build can host the Lab at the demo repository base
         env:
           VITE_PUBLIC_BASE: /museum_demos/

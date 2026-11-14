@@ -19,7 +19,7 @@ for(const file of ['index.html','assets/worlds.json']){
 }
 for(const rel of ['vendor/three187/three.core.js','vendor/three187/three.module.js','vendor/three187/OrbitControls.js','vendor/three187/LICENSE.txt','sw.js','assets/lab.js','assets/lab.css','assets/public-boot.js','vendor/three.module.min.js','vendor/three.core.min.js','vendor/THREE_LICENSE.txt'])assert(fs.existsSync(path.join(root,rel)),rel);
 const payloads=JSON.parse(fs.readFileSync(path.join(root,'docs/PUBLIC_PAYLOADS.json'),'utf8'));
-assert.equal(payloads.length,20);
+assert.equal(payloads.length,21);
 for(const c of catalog.filter(x=>x.playable_candidate)){
  const archive=fs.readFileSync(path.join(root,'payload',c.id+'.zip'));
  const entries=new Map();let o=0;

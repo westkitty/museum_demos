@@ -23,6 +23,18 @@ jobs:
         run: node tests/world-audition-package.mjs
       - name: Install Chromium
         run: npx playwright install --with-deps chromium
+      - name: Reproduce Gardens nested service worker 404 and test causal control
+        continue-on-error: true
+        timeout-minutes: 4
+        run: node tests/world-audition-gardens-forensics.mjs
+      - name: Preserve Gardens 404 forensic evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: world-audition-gardens-forensics
+          path: test-results/world-audition-gardens-forensics.json
+          if-no-files-found: warn
+          retention-days: 7
       - name: Smoke-test served preview through real Chromium WebGL
         run: |
           python3 -m http.server 8765 --bind 127.0.0.1 --directory public > /tmp/world-audition-http.log 2>&1 &

@@ -6,7 +6,7 @@ This folder is a public-safe, **unverified runtime candidate** for the independe
 
 The original Lab interface is preserved with a bounded public transport adapter. Only the 21 executable preview subsets are repacked as seekable, uncompressed ZIP_STORED per-world payloads; a scoped service worker serves them as same-origin URLs. This requires HTTPS or localhost, service-worker support, and WebGL2. The UI supports only one active iframe at a time.
 
-**Proof:** static payload manifest and JS syntax may pass before commit. Real WebGL interaction, 20 complete playthroughs, mobile GPU and sustained performance must be independently verified; until then do not call this a released playable collection.
+**Proof:** static payload manifest and JS syntax may pass before commit. Real WebGL interaction, 21 complete playthroughs, mobile GPU and sustained performance must be independently verified; until then do not call this a released playable collection.
 
 The existing repository's museum Pages workflow is not a valid publication proof for this folder and must not be triggered without correction.
 ## Additive source packaging: INFINITUM (2026-11-14)

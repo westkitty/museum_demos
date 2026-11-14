@@ -8,6 +8,7 @@
   const WORLD_MAP = new Map(WORLD_LIST.map(w => [w.id,w]));
   const DIMS = ['Identity','Gameplay','Visual impact','Accessibility','Performance'];
   const STORAGE = 'museum-world-audition-standalone-expansion-20261114-v1';
+  const UNDO_STORAGE = STORAGE + '-before-import';
   let filter = 'all', search = '', activeId = WORLD_LIST[0].id, compare = [], currentFrame = null, currentWorld = null, startStamp = 0;
   let prefs = {motion:false};
   let record = {version:1, world:{}};
@@ -121,14 +122,56 @@
   function downloadFile(name,text){const blob=new Blob([text],{type:'application/json;charset=utf-8'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),15000);}
   function exportReview(){const payload={app:'World Audition Lab — Independent Expansion',schemaVersion:1,generatedAt:new Date().toISOString(),sourceCount:WORLD_LIST.length,review:record.world};downloadFile('world-audition-review-2026-11-14.json',JSON.stringify(payload,null,2));toast('Exported your locally entered scores and notes.');}
   function importReview(){byId('review-upload').click();}
-  async function onUpload(file){if(!file)return;if(file.size>700000){toast('The review file is too large.');return;}let value;
-    try{value=JSON.parse(await file.text());if(value?.schemaVersion!==1||!value?.review||typeof value.review!=='object')throw Error('Unrecognized review format');
-      let imported=0;for(const id of WORLD_MAP.keys()){if(Object.hasOwn(value.review,id)){record.world[id]=sanitizeEntry(value.review[id]);imported++;}}persist();renderCards();toast(`Imported local reviews for ${imported} known worlds.`);
-    }catch(_){toast('Import rejected: wrong schema or malformed JSON.');}
-    byId('review-upload').value='';}
+  function refreshUndoControl(){
+    const button=byId('undo-review-import');if(!button)return;
+    try{button.disabled=!localStorage.getItem(UNDO_STORAGE);}catch(_){button.disabled=true;}
+  }
+  function undoReviewImport(){
+    try{
+      const saved=JSON.parse(localStorage.getItem(UNDO_STORAGE)||'null');
+      if(!saved||saved.schemaVersion!==1||!saved.world||typeof saved.world!=='object'||Array.isArray(saved.world))throw Error('Missing or invalid import backup');
+      const before=Object.create(null);
+      for(const id of WORLD_MAP.keys()){
+        if(!Object.hasOwn(saved.world,id))throw Error('Incomplete import backup');
+        before[id]=sanitizeEntry(saved.world[id]);
+      }
+      if(!window.confirm('Restore reviews from immediately before the last import? Changes made after that import will be replaced.'))return;
+      localStorage.setItem(STORAGE,JSON.stringify({...record,world:before,prefs}));
+      record.world=before;
+      try{localStorage.removeItem(UNDO_STORAGE);}catch(_){}
+      renderCards();refreshUndoControl();toast('Restored local reviews from before the last import.');
+    }catch(err){toast('Undo unavailable: '+String(err?.message||err).slice(0,120));}
+  }
+  async function onUpload(file){
+    if(!file)return;
+    try{
+      if(file.size>700000)throw Error('Review file is too large');
+      const value=JSON.parse(await file.text());
+      const plan=window.WorldAuditionReviewPlan.planImport(value,record.world,[...WORLD_MAP.keys()],sanitizeEntry);
+      if(!window.confirm(`Import ${plan.count} known-world reviews? Existing entries for those worlds will be replaced. A local undo backup will be saved first.`))return;
+      let previousBackup=null;
+      try{
+        previousBackup=localStorage.getItem(UNDO_STORAGE);
+        localStorage.setItem(UNDO_STORAGE,JSON.stringify({schemaVersion:1,world:plan.before}));
+        localStorage.setItem(STORAGE,JSON.stringify({...record,world:plan.after,prefs}));
+      }catch(_){
+        try{if(previousBackup===null)localStorage.removeItem(UNDO_STORAGE);else localStorage.setItem(UNDO_STORAGE,previousBackup);}catch(_){}
+        throw Error('Local storage denied or full; import blocked to protect existing reviews');
+      }
+      record.world=plan.after;renderCards();refreshUndoControl();
+      toast(`Imported ${plan.count} world reviews. Undo is available in Lab settings.`);
+    }catch(err){toast('Import rejected: '+String(err?.message||err).slice(0,140));}
+    finally{byId('review-upload').value='';}
+  }
   function resetReviews(){if(!window.confirm('Erase Lab audition notes, scores and visited markers on this browser? Original projects and source files are never touched.'))return;
-    record={version:1,world:{}};for(const id of WORLD_MAP.keys())record.world[id]=sanitizeEntry();compare=[];persist();renderCards();renderCompareButton();toast('Only local Lab review data was cleared.');}
-  function start(){restore();byId('world-count').textContent=WORLD_LIST.length;byId('ready-count').textContent=WORLD_LIST.filter(w=>w.playable_candidate).length;byId('source-count').textContent=WORLD_LIST.length*5;
+    record={version:1,world:{}};for(const id of WORLD_MAP.keys())record.world[id]=sanitizeEntry();compare=[];persist();
+    try{localStorage.removeItem(UNDO_STORAGE);}catch(_){}refreshUndoControl();
+    renderCards();renderCompareButton();toast('Only local Lab review data was cleared.');}
+  function start(){restore();
+    const undo=el('button','quiet-btn','Undo last import');undo.id='undo-review-import';undo.type='button';
+    byId('import-review').insertAdjacentElement('afterend',undo);
+    undo.addEventListener('click',undoReviewImport);refreshUndoControl();
+    byId('world-count').textContent=WORLD_LIST.length;byId('ready-count').textContent=WORLD_LIST.filter(w=>w.playable_candidate).length;byId('source-count').textContent=WORLD_LIST.length*5;
     renderMap();renderCompareButton();
     document.addEventListener('click',e=>{const open=e.target.closest('[data-open]');if(open){openDetail(open.dataset.open);return;}const map=e.target.closest('[data-map-world]');if(map){openDetail(map.dataset.mapWorld);return;}const fil=e.target.closest('[data-filter]');if(fil){filter=fil.dataset.filter;renderCards();return;}});
     byId('search').addEventListener('input',e=>{search=e.target.value.trim().toLowerCase().slice(0,100);renderCards();});

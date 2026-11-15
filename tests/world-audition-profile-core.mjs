@@ -17,8 +17,12 @@ export function classifyTrace(record){
   if(!record.firstDrawAt) return 'NO_WEBGL_DRAW';
   if(!record.nextRafAt) return 'NO_FOLLOWING_RAF';
   if(!record.iframeRemoved) return 'TEARDOWN_FAILED';
+  if(record.backendVerified===false) return 'BACKEND_MISMATCH';
   if(record.pageErrors?.length) return 'PAGE_ERROR';
   return record.actionError?'SLOW_ACTION_WITH_RENDER_PROOF':'PASS';
+}
+export function isMuseumDemosRemote(value){
+  return typeof value==='string'&&/^(?:https:\/\/github\.com\/|git@github\.com:)westkitty\/museum_demos(?:\.git)?$/i.test(value);
 }
 export function expectedBackend(mode,renderer){
   if(typeof renderer!=='string')return false;

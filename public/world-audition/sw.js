@@ -33,13 +33,32 @@ function adaptGardensModule(slug,key,bytes){
  return new TextEncoder().encode(source.replace(marker,
    'void 0; /* Lab outer service worker owns this offline preview. */'));
 }
+
+// A source-pinned adapter for a 700ms introduction-tour race in Theater.
+// The original ZIP is immutable. Only the exact archived module is adapted,
+// and any source drift leaves the bytes untouched for regression detection.
+function adaptTheaterTour(slug,key,bytes){
+ if(slug!=='theater'||key!=='worlds/theater/assets/index-BDYrz-Ry.js')return bytes;
+ const source=new TextDecoder().decode(bytes);
+ const replacements=[
+  ['const yt=W("tour-dialog"),lt=','let __labTourPending=null;const yt=W("tour-dialog"),lt='],
+  ['v=function(){tt=0,R(),yt.showModal()}','v=function(){window.clearTimeout(__labTourPending),__labTourPending=null,tt=0,R(),yt.showModal()}'],
+  ['b=function(){document.querySelectorAll(".tour-highlight").forEach(M=>M.classList.remove("tour-highlight")),yt.close(),Pt.tourSeen=!0,i()}','b=function(){window.clearTimeout(__labTourPending),__labTourPending=null,document.querySelectorAll(".tour-highlight").forEach(M=>M.classList.remove("tour-highlight")),yt.close(),Pt.tourSeen=!0,i()}'],
+  ['Pt.tourSeen||window.setTimeout(v,700)','Pt.tourSeen||(__labTourPending=window.setTimeout(v,700))']
+ ];
+ if(replacements.some(([before])=>source.split(before).length!==2))return bytes;
+ let adapted=source;
+ for(const [before,after] of replacements)adapted=adapted.replace(before,after);
+ return new TextEncoder().encode(adapted);
+}
+
 async function serve(url){const suffix=url.pathname.slice(scope.pathname.length);const parts=suffix.split('/');
  if(parts[0]!=='worlds'||parts.length<3)return fetch(url.toString());
  const slug=parts[1];if(!/^[a-z0-9-]+$/.test(slug))return new Response('Invalid world',{status:400});
  try{const {buffer,entries}=await load(slug),key=parts.join('/'),entry=entries.get(key);
   if(!entry)return new Response('Missing preview resource',{status:404});
   const raw=new Uint8Array(buffer,entry.offset,entry.length),ext=key.split('.').pop().toLowerCase();
-  const bytes=adaptGardensModule(slug,key,raw);
+  const bytes=adaptTheaterTour(slug,key,adaptGardensModule(slug,key,raw));
   return new Response(bytes,{status:200,headers:{'Content-Type':types[ext]||'application/octet-stream','X-Content-Type-Options':'nosniff','Cache-Control':'public, max-age=86400'}});
  }catch(e){return new Response('Preview could not load',{status:503});}}
 self.addEventListener('fetch',event=>{const url=new URL(event.request.url);if(url.origin!==scope.origin||!url.pathname.startsWith(scope.pathname+'worlds/'))return;

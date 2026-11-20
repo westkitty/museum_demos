@@ -25,13 +25,20 @@ try{
   await page.locator('[data-open="'+slug+'"]').first().click({timeout:15000});
   await page.locator('#detail-launch').click();
   await page.waitForFunction(id=>{const f=document.querySelector('#player iframe');return !!f?.contentDocument&&f.contentDocument.readyState==='complete'&&f.contentDocument.URL.includes('/worlds/'+id+'/index.html');},slug,{timeout:45000});
+  if(slug==='infinitum'){
+    const frame=page.frameLocator('#player iframe');
+    await frame.locator('#interface button').first().waitFor({state:'attached',timeout:45000});
+    const webgl=await frame.locator('#universe').evaluate(c=>!!c.getContext('webgl2'));
+    if(!webgl)throw Error('INFINITUM did not create a WebGL2 context');
+    console.log('PASS INFINITUM r187 live UI + WebGL2');
+  }
   if(errors.length>countBefore)throw Error(slug+' page error: '+errors.slice(countBefore).join(' | '));
   // Some authored worlds capture pointer input; exercise the Lab DOM teardown independently.
   await page.locator('#play-close').evaluate(button=>button.click());
   if(await page.locator('#player iframe').count())throw Error(slug+' iframe persisted on exit');
   loaded.push(slug);
  }
- if(loaded.length!==20)throw Error('Expected 20 loaded previews, got '+loaded.length);
+ if(loaded.length!==21)throw Error('Expected 21 loaded previews, got '+loaded.length);
  console.log('PASS all-world document sweep:',loaded.join(', '));
  console.log('PASS public preview smoke: service worker, dollhouse canvas/WebGL, iframe teardown, 0 page errors');
 }finally{await browser.close();}

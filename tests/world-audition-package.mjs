@@ -10,16 +10,16 @@ const catalog=JSON.parse(hit[1]);
 assert.equal(catalog.length,21);
 assert.equal(new Set(catalog.map(x=>x.id)).size,21);
 assert.equal(catalog.flatMap(x=>x.opportunities).length,105);
-assert.equal(catalog.filter(x=>x.playable_candidate).length,20);
+assert.equal(catalog.filter(x=>x.playable_candidate).length,21);
 assert(!fs.existsSync(path.join(root,'archives')),'private source archives must not be public');
 assert(!fs.existsSync(path.join(root,'worlds')),'no raw build/source tree may be public');
 for(const file of ['index.html','assets/worlds.json']){
  const text=fs.readFileSync(path.join(root,file),'utf8');
  assert(!/(?:\/mnt\/data|\/Users\/|\/home\/oai|(?:C:|D:)\\\\Users\\\\)/.test(text),`${file} contains internal build-machine paths`);
 }
-for(const rel of ['sw.js','assets/lab.js','assets/lab.css','assets/public-boot.js','vendor/three.module.min.js','vendor/three.core.min.js','vendor/THREE_LICENSE.txt'])assert(fs.existsSync(path.join(root,rel)),rel);
+for(const rel of ['vendor/three187/three.core.js','vendor/three187/three.module.js','vendor/three187/OrbitControls.js','vendor/three187/LICENSE.txt','sw.js','assets/lab.js','assets/lab.css','assets/public-boot.js','vendor/three.module.min.js','vendor/three.core.min.js','vendor/THREE_LICENSE.txt'])assert(fs.existsSync(path.join(root,rel)),rel);
 const payloads=JSON.parse(fs.readFileSync(path.join(root,'docs/PUBLIC_PAYLOADS.json'),'utf8'));
-assert.equal(payloads.length,20);
+assert.equal(payloads.length,21);
 for(const c of catalog.filter(x=>x.playable_candidate)){
  const archive=fs.readFileSync(path.join(root,'payload',c.id+'.zip'));
  const entries=new Map();let o=0;
@@ -43,4 +43,4 @@ for(const c of catalog.filter(x=>x.playable_candidate)){
   assert(entries.has(target)||fs.existsSync(path.join(root,target)),`${c.id} missing ${target}`);
  }
 }
-console.log(`PASS public artifact: ${catalog.length} families, 20 stored preview payloads, 105 proposals, 0 private ZIP archives`);
+console.log(`PASS public artifact: ${catalog.length} families, 21 stored preview payloads, 105 proposals, 0 private ZIP archives`);

@@ -6,7 +6,7 @@ import {existsSync,readFileSync} from 'node:fs';
 import path from 'node:path';
 const root=path.resolve('dist');
 const app=path.join(root,'world-audition');
-const required=['index.html','assets/lab.css','assets/lab.js','assets/public-boot.js','assets/worlds.json','sw.js','vendor/three.module.min.js','vendor/THREE_LICENSE.txt','docs/PUBLIC_PAYLOADS.json'];
+const required=['vendor/three187/three.core.js','vendor/three187/three.module.js','vendor/three187/OrbitControls.js','vendor/three187/LICENSE.txt','index.html','assets/lab.css','assets/lab.js','assets/public-boot.js','assets/worlds.json','sw.js','vendor/three.module.min.js','vendor/THREE_LICENSE.txt','docs/PUBLIC_PAYLOADS.json'];
 for(const f of required)assert(existsSync(path.join(app,f)),`Pages release missing ${f}`);
 const info=JSON.parse(readFileSync(path.join(root,'build-info.json'),'utf8'));
 assert.equal(info.base,'/museum_demos/','GitHub Pages base must be this repository');
@@ -17,13 +17,13 @@ const embedded=JSON.parse(html.match(/<script id="world-json" type="application\
 assert.deepEqual(embedded,catalog,'embedded catalogue must match JSON source');
 assert.equal(catalog.length,21);
 assert.equal(catalog.flatMap(w=>w.opportunities).length,105);
-assert.equal(catalog.filter(w=>w.playable_candidate).length,20);
+assert.equal(catalog.filter(w=>w.playable_candidate).length,21);
 for(const name of ['index.html','assets/worlds.json']){
  const text=readFileSync(path.join(app,name),'utf8');
  assert(!/(?:\/mnt\/data|\/Users\/|\/home\/oai|(?:C:|D:)\\\\Users\\\\)/.test(text),`${name}: leaked build path`);
 }
 const manifest=JSON.parse(readFileSync(path.join(app,'docs/PUBLIC_PAYLOADS.json'),'utf8'));
-assert.equal(manifest.length,20);
+assert.equal(manifest.length,21);
 const byId=new Map(manifest.map(x=>[x.slug,x]));
 for(const w of catalog.filter(x=>x.playable_candidate)){
  const m=byId.get(w.id);assert(m,`missing payload for ${w.id}`);
@@ -35,4 +35,4 @@ for(const w of catalog.filter(x=>x.playable_candidate)){
 }
 for(const forbidden of ['archives','src','source','node_modules','.env'])assert(!existsSync(path.join(app,forbidden)),`public site includes ${forbidden}`);
 const bytes=manifest.reduce((sum,x)=>sum+x.bytes,0);
-console.log(`PASS Pages Lab: ${catalog.length} families, ${manifest.length} verified lazy payloads, ${(bytes/1024/1024).toFixed(2)} MiB deferred, 105 proposed ideas, no original source archives or absolute build paths`);
+console.log(`PASS Pages Lab: ${catalog.length} families, ${manifest.length} verified lazy payloads, ${(bytes/1024/1024).toFixed(2)} MiB deferred, 105 tracked opportunities (INFINITUM runtime implementation), no original source archives or absolute build paths`);

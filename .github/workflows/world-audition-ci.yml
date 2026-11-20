@@ -23,10 +23,54 @@ jobs:
         run: node tests/world-audition-package.mjs
       - name: Install Chromium
         run: npx playwright install --with-deps chromium
+      - name: Verify Gardens Lab adapter eliminates nested worker 404
+        timeout-minutes: 4
+        run: GARDENS_EXPECT_ADAPTER=1 node tests/world-audition-gardens-forensics.mjs
+      - name: Preserve Gardens adapter regression evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: world-audition-gardens-forensics
+          path: test-results/world-audition-gardens-forensics.json
+          if-no-files-found: warn
+          retention-days: 7
       - name: Smoke-test served preview through real Chromium WebGL
         run: |
           python3 -m http.server 8765 --bind 127.0.0.1 --directory public > /tmp/world-audition-http.log 2>&1 &
           node tests/world-audition-browser.mjs
+      - name: Run protected review-import regression tests
+        run: node --test tests/world-audition-review-import.test.mjs
+      - name: Verify E09 dual-backend profiling contract
+        run: node --test tests/world-audition-profile.test.mjs
+      - name: Optional portable E09 trusted-input SwiftShader compatibility
+        if: github.event_name == 'workflow_dispatch'
+        continue-on-error: true
+        timeout-minutes: 5
+        run: node tests/world-audition-profile.mjs --mode=swiftshader --runs=1 --input=keyboard --out=test-results/world-audition-profile-swiftshader.json
+      - name: Preserve optional E09 SwiftShader compatibility evidence
+        if: always() && github.event_name == 'workflow_dispatch'
+        uses: actions/upload-artifact@v4
+        with:
+          name: world-audition-e09-swiftshader-compatibility
+          path: test-results/world-audition-profile-swiftshader.json
+          if-no-files-found: warn
+          retention-days: 7
+      - name: Observe all 21 startup/WebGL paths (diagnostic, not a release gate)
+        continue-on-error: true
+        timeout-minutes: 10
+        run: |
+          python3 -m http.server 8767 --bind 127.0.0.1 --directory public > /tmp/world-audition-evidence-http.log 2>&1 &
+          evidence_server=$!
+          trap 'kill "$evidence_server" 2>/dev/null || true' EXIT
+          WORLD_AUDITION_URL=http://127.0.0.1:8767/world-audition/ node tests/world-audition-evidence.mjs
+      - name: Preserve observed startup evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: world-audition-startup-evidence
+          path: test-results/world-audition-runtime-evidence.json
+          if-no-files-found: warn
+          retention-days: 7
       - name: Prove Pages build can host the Lab at the demo repository base
         env:
           VITE_PUBLIC_BASE: /museum_demos/

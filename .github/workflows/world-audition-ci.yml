@@ -38,6 +38,13 @@ jobs:
         run: |
           python3 -m http.server 8765 --bind 127.0.0.1 --directory public > /tmp/world-audition-http.log 2>&1 &
           node tests/world-audition-browser.mjs
+      - name: Verify Theater tour timer cancellation through real Chromium
+        timeout-minutes: 4
+        run: |
+          python3 -m http.server 8768 --bind 127.0.0.1 --directory public > /tmp/world-audition-theater-http.log 2>&1 &
+          theater_server=$!
+          trap 'kill "$theater_server" 2>/dev/null || true' EXIT
+          WORLD_AUDITION_URL=http://127.0.0.1:8768/world-audition/ node tests/world-audition-theater-tour.mjs
       - name: Run protected review-import regression tests
         run: node --test tests/world-audition-review-import.test.mjs
       - name: Verify E09 dual-backend profiling contract
